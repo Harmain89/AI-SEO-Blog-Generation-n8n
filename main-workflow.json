@@ -1,0 +1,329 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "id": "0762a8eb-15cc-44a2-a265-615d94074087",
+      "name": "Daily Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const categories = [\n  { name: 'Artificial Intelligence', query: 'AI model release GPT Claude Gemini Grok LLM benchmark 2026 when:1d' },\n  { name: 'AI Agents & Tools', query: 'AI agent automation workflow tool OpenAI Anthropic Google developer 2026 when:1d' },\n  { name: 'Software Development', query: 'programming language framework React Node Python JavaScript TypeScript Rust 2026 when:2d' },\n  { name: 'Developer Tools', query: 'GitHub VS Code IDE DevOps Docker Kubernetes CI/CD developer productivity 2026 when:2d' },\n  { name: 'Cybersecurity', query: 'cybersecurity data breach hack vulnerability ransomware zero-day exploit 2026 when:1d' },\n  { name: 'Tech Industry', query: 'tech startup acquisition IPO funding product launch Silicon Valley big tech 2026 when:2d' },\n  { name: 'Cloud & Infrastructure', query: 'cloud computing AWS Azure Google Cloud serverless edge computing infrastructure 2026 when:2d' },\n];\nconst pick = categories[Math.floor(Math.random() * categories.length)];\nconst q = encodeURIComponent(pick.query);\nconst feedUrl = 'https://news.google.com/rss/search?q=' + q + '&hl=en-US&gl=US&ceid=US:en';\nreturn [{ json: { category: pick.name, feedUrl } }];"
+      },
+      "id": "9b5963df-0d42-4d99-8cc8-a53b43b9fed0",
+      "name": "Pick Trending Topic Feed",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.feedUrl }}",
+        "options": {}
+      },
+      "id": "18c503cc-715c-42fd-bc1c-c3a68afb6d14",
+      "name": "Fetch Trending Headlines",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        448,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nif (!items.length) { return []; }\nconst category = $('Pick Trending Topic Feed').first().json.category;\nconst pool = items.slice(0, 6);\nconst chosen = pool[Math.floor(Math.random() * pool.length)].json;\nconst topic = String(chosen.title || '').replace(/\\s+-\\s+[^-]+$/, '').trim();\nreturn [{ json: {\n  category,\n  topic,\n  sourceUrl: chosen.link || chosen.guid || '',\n  snippet: String(chosen.contentSnippet || chosen.content || '').slice(0, 400),\n} }];"
+      },
+      "id": "1e2c3a2f-296f-42fa-91d7-4a4d79e93dff",
+      "name": "Select Top Headline",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "gpt-4o-mini"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=Write an original SEO tech news article inspired by this trending item.\nCategory: {{ $json.category }}\nTrending headline: {{ $json.topic }}\nContext: {{ $json.snippet }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "instructions": "You are a senior tech journalist writing for a publication like TechRadar, The Verge, or Gizmodo. Your audience is developers, engineers, and tech enthusiasts who are deeply familiar with the industry and want both technical depth AND personality in their news. They notice and hate bland, generic AI writing.\n\nGiven a trending tech headline, write a sharp, informed article of 900-1100 words.\n\nTITLE rules (make it irresistible to tech readers):\n- Use competitive framing: \"X vs Y: Which Actually Wins in 2026?\"\n- Use stakes/impact: \"Why Every Developer Should Care About [X]\"\n- Use trend angles: \"The Quiet Shift Changing How Teams Write Code\"\n- Use punchy specificity: \"Anthropic's New Model Can Browse the Web Autonomously - Here's the Catch\"\n- Never just state the news plainly (\"Company X Releases Product Y\") - always add the angle\n\nSTRUCTURE (follow this order):\n1. Hook lede (1 short paragraph): Frame the news as an industry moment, not just a product launch. Instead of \"Anthropic released Claude Sonnet 5\", write \"The AI agent race just got a new frontrunner - and this time, it's not about raw intelligence.\"\n2. The news (what happened, with specifics: version numbers, dates, benchmarks if relevant)\n3. Technical context (how this compares to previous versions, rivals, or prior state of the field)\n4. Developer/user impact (what this means practically for people who build or use this tech)\n5. Industry implications (what this signals for the broader tech landscape - competitive dynamics, open-source vs proprietary, hype vs reality)\n6. One expert-attributed insight (synthesise a realistic quote from a developer, analyst, or researcher; attribute clearly: \"Dr. Sarah Kim, AI researcher at Stanford, noted...\")\n7. Verdict (1-2 sentence close that gives the reader a clear takeaway and forward-looking thought)\n\nWRITING rules:\n- Active voice, short punchy sentences mixed with longer ones for rhythm\n- Use comparisons: \"unlike GPT-4o which required...\", \"compared to last year's benchmark...\"\n- Cite specific plausible numbers: user counts, benchmark scores, percentage improvements\n- Avoid filler phrases: \"in today's digital age\", \"it's worth noting\", \"delve into\", \"navigate\"\n- Light irony is welcome (Gizmodo style) when there is genuine industry tension to highlight\n- Always write for a reader who already knows what Python, APIs, and neural networks are\n\nRespond with ONLY a single valid JSON object (no markdown, no code fences) using exactly these keys:\n\"title\" (compelling tech headline, under 70 chars - apply the title rules above)\n\"excerpt\" (2-3 sentence hook under 220 chars - the most interesting angle up front)\n\"metaDescription\" (SEO meta under 155 chars)\n\"metaKeywords\" (array of 6-9 keyword strings - include tech-specific terms)\n\"tags\" (array of 3-5 short topic tags, e.g. [\"AI\", \"Claude\", \"LLM\", \"Anthropic\"])\n\"category\" (the given category)\n\"imageSearchQuery\" (3-4 specific keywords for finding relevant stock/editorial photos; think tech aesthetics: \"developer laptop dark mode code\", \"AI circuit board glowing\", \"server room blue light\", \"hacker dark keyboard screen\")\n\"content\" (full article body as clean semantic HTML using <p>, <h2>, <h3>, <ul>, <li>, <blockquote>; NO <h1> or title inside content; place <!--INLINE_IMAGE_1--> after the first major section ends; place <!--INLINE_IMAGE_2--> after the second major section ends)\n\"imagePrompt\" (vivid cinematic prompt for an editorial featured image; think TechRadar/Verge aesthetics: \"close-up of glowing circuit board with blue-purple LED lighting, shallow depth of field, professional product photography style, dark background\"; no text in image, photorealistic)\n\"imageAlt\" (concise descriptive alt text)\nThe JSON must be strictly parseable.",
+          "maxTokens": 2200,
+          "textFormat": {
+            "textOptions": {
+              "type": "json_object"
+            }
+          },
+          "temperature": 0.8
+        }
+      },
+      "id": "dffb7802-71a9-4299-a711-5a825cde8be8",
+      "name": "Write SEO Article",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        896,
+        0
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "Wj5nwh86U6EyND93",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nfunction tryParse(v) {\n  if (v == null) return null;\n  if (typeof v === 'object') return v;\n  if (typeof v === 'string') {\n    try { return JSON.parse(v); } catch (e) {\n      const m = v.match(/\\{[\\s\\S]*\\}/);\n      if (m) { try { return JSON.parse(m[0]); } catch (_) {} }\n    }\n  }\n  return null;\n}\nlet data = null;\nif (Array.isArray(item.output)) {\n  for (const o of item.output) {\n    const contents = Array.isArray(o.content) ? o.content : [];\n    for (const c of contents) {\n      data = data || tryParse(c.text) || tryParse(c.output_text);\n    }\n  }\n}\ndata = data || tryParse(item.content) || tryParse(item.text) || tryParse(item.output_text) || tryParse(item.message && item.message.content);\nif (!data) { throw new Error('No JSON found in model output'); }\nconst meta = $('Select Top Headline').first().json;\ndata.category = data.category || meta.category;\ndata.sourceUrl = meta.sourceUrl || '';\ndata.topic = meta.topic || '';\nif (Array.isArray(data.metaKeywords)) data.metaKeywords = data.metaKeywords.join(', ');\nif (Array.isArray(data.tags) === false && typeof data.tags === 'string') data.tags = data.tags.split(',').map(t => t.trim()).filter(Boolean);\nif (!data.imagePrompt) data.imagePrompt = 'Editorial photograph representing ' + (data.title || meta.topic);\nif (!data.imageSearchQuery) data.imageSearchQuery = (data.category || '') + ' ' + (data.title || '').slice(0, 40);\nreturn [{ json: data }];"
+      },
+      "id": "3fd5a4f6-6fb2-45b7-9fe7-259dd9678c9f",
+      "name": "Parse Article JSON",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1248,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const PEXELS_API_KEY = 'YOUR_PEXELS_API_KEY';\nconst data = $input.first().json;\nconst imageSearchQuery = (data.imageSearchQuery || data.title || data.category || 'technology').slice(0, 80);\nconst headline = (data.title || imageSearchQuery).slice(0, 80);\nlet inlineImage1 = null;\nlet inlineImage2 = null;\ntry {\n  const wikiQuery = encodeURIComponent(headline);\n  const wikiUrl = 'https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=' + wikiQuery + '&gsrlimit=8&prop=pageimages&piprop=thumbnail|original&pithumbsize=1200&pilimit=8&format=json&origin=*';\n  const wikiResp = await fetch(wikiUrl, { headers: { 'User-Agent': 'TrendwireBot/1.0' } });\n  if (wikiResp.ok) {\n    const wikiData = await wikiResp.json();\n    const pages = Object.values(wikiData?.query?.pages || {});\n    for (const page of pages) {\n      const src = page?.original?.source || page?.thumbnail?.source;\n      if (src && !src.toLowerCase().endsWith('.svg')) {\n        inlineImage1 = { url: src, alt: page.title || imageSearchQuery, caption: 'Related image', source: 'Wikimedia Commons' };\n        break;\n      }\n    }\n  }\n} catch (e) {}\nif (PEXELS_API_KEY && PEXELS_API_KEY !== 'YOUR_PEXELS_API_KEY') {\n  try {\n    const pexelsQuery = encodeURIComponent(imageSearchQuery);\n    const pexelsUrl = 'https://api.pexels.com/v1/search?query=' + pexelsQuery + '&per_page=3&orientation=landscape&size=large';\n    const pexelsResp = await fetch(pexelsUrl, { headers: { 'Authorization': PEXELS_API_KEY } });\n    if (pexelsResp.ok) {\n      const pexelsData = await pexelsResp.json();\n      const photos = pexelsData?.photos || [];\n      if (photos.length > 0) {\n        const photo = photos[0];\n        const imgUrl = photo?.src?.large2x || photo?.src?.large || photo?.src?.medium;\n        if (imgUrl) { inlineImage2 = { url: imgUrl, alt: photo.alt || imageSearchQuery, caption: 'Photo by ' + (photo.photographer || 'Pexels'), source: 'Pexels' }; }\n      }\n    }\n  } catch (e) {}\n}\nreturn [{ json: { ...data, inlineImage1, inlineImage2 } }];"
+      },
+      "id": "efdf14e6-1368-4583-884d-62ea5c0fa6c7",
+      "name": "Fetch Inline Images",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1472,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\nlet content = data.content || '';\nfunction buildFigure(img) {\n  if (!img || !img.url) return null;\n  const alt = (img.alt || '').replace(/\"/g, '&quot;');\n  const caption = img.caption || '';\n  const source = img.source || '';\n  return '<figure class=\"inline-figure\"><img src=\"' + img.url + '\" alt=\"' + alt + '\" loading=\"lazy\" /><figcaption>' + caption + (source ? ' \\u2014 via ' + source : '') + '</figcaption></figure>';\n}\nconst fig1 = buildFigure(data.inlineImage1);\nconst fig2 = buildFigure(data.inlineImage2);\ncontent = content.replace('<!--INLINE_IMAGE_1-->', fig1 || '');\ncontent = content.replace('<!--INLINE_IMAGE_2-->', fig2 || '');\nreturn [{ json: { ...data, content } }];"
+      },
+      "id": "f6c905d7-98fa-4dbe-98a1-1f346289d7d9",
+      "name": "Inject Images Into Content",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1696,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "modelId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "gpt-image-1"
+        },
+        "prompt": "={{ $json.imagePrompt }}",
+        "options": {
+          "quality": "medium"
+        }
+      },
+      "id": "0ba0b6b7-f21c-4bae-bd4c-6df6ad5be67a",
+      "name": "Generate Featured Image",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        1920,
+        0
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "Wj5nwh86U6EyND93",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.all();\nconst out = [];\nfor (let i = 0; i < input.length; i++) {\n  const item = input[i];\n  const binKey = item.binary ? (item.binary.data ? 'data' : Object.keys(item.binary)[0]) : null;\n  const bin = binKey ? item.binary[binKey] : null;\n  let mime = (bin && bin.mimeType) || 'image/png';\n  let b64 = '';\n  try {\n    const buf = await this.helpers.getBinaryDataBuffer(i, binKey || 'data');\n    b64 = buf.toString('base64');\n  } catch (e) {\n    b64 = (bin && bin.data) ? bin.data : '';\n  }\n  out.push({ json: { imageBase64: b64, imageMime: mime } });\n}\nreturn out;"
+      },
+      "id": "809fac1b-0d3a-48d3-866d-da95c502955a",
+      "name": "Image To Base64",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2144,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:5000/api/ingest/posts",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Ingest-Token",
+              "value": "seoblog_2f8a1c9e4b7d6035aa19c4f7e2b8d5610c3f9a72e6d418bf"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {\n  \"title\": $(\"Inject Images Into Content\").first().json.title,\n  \"content\": $(\"Inject Images Into Content\").first().json.content,\n  \"excerpt\": $(\"Inject Images Into Content\").first().json.excerpt,\n  \"metaDescription\": $(\"Inject Images Into Content\").first().json.metaDescription,\n  \"metaKeywords\": $(\"Inject Images Into Content\").first().json.metaKeywords,\n  \"category\": $(\"Inject Images Into Content\").first().json.category,\n  \"tags\": $(\"Inject Images Into Content\").first().json.tags,\n  \"imageAlt\": $(\"Inject Images Into Content\").first().json.imageAlt,\n  \"sourceUrl\": $(\"Inject Images Into Content\").first().json.sourceUrl,\n  \"imageBase64\": $json.imageBase64,\n  \"imageMime\": $json.imageMime\n} }}",
+        "options": {}
+      },
+      "id": "5e9aca32-56ff-404d-bd99-1ea49b98711f",
+      "name": "Publish to Blog",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        2368,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Daily Trigger": {
+      "main": [
+        [
+          {
+            "node": "Pick Trending Topic Feed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pick Trending Topic Feed": {
+      "main": [
+        [
+          {
+            "node": "Fetch Trending Headlines",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Trending Headlines": {
+      "main": [
+        [
+          {
+            "node": "Select Top Headline",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select Top Headline": {
+      "main": [
+        [
+          {
+            "node": "Write SEO Article",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write SEO Article": {
+      "main": [
+        [
+          {
+            "node": "Parse Article JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Article JSON": {
+      "main": [
+        [
+          {
+            "node": "Fetch Inline Images",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Inline Images": {
+      "main": [
+        [
+          {
+            "node": "Inject Images Into Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Inject Images Into Content": {
+      "main": [
+        [
+          {
+            "node": "Generate Featured Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Featured Image": {
+      "main": [
+        [
+          {
+            "node": "Image To Base64",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image To Base64": {
+      "main": [
+        [
+          {
+            "node": "Publish to Blog",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp",
+    "instanceId": "21cb3c5ab0e736975c3d833ed9242e7a054b56c683027b8ac34ff8b391fc0bad"
+  }
+}

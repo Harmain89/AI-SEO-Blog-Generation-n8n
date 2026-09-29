@@ -1,0 +1,20 @@
+{
+  "name": "automated-seo-blog-server",
+  "version": "1.0.0",
+  "description": "Express + Sequelize (MySQL) backend for the Automated SEO Blog. Serves the public blog API and a token-secured ingest endpoint for the n8n content workflow.",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "seed": "node src/seed/seed.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "morgan": "^1.10.0",
+    "mysql2": "^3.12.0",
+    "sequelize": "^6.37.5"
+  }
+}

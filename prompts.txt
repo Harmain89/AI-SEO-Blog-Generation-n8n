@@ -1,0 +1,82 @@
+========================================================================
+Prompts used by the "Automated-SEO-Blog-Posts" n8n workflow
+========================================================================
+
+--- SYSTEM / INSTRUCTIONS (Write SEO Article node, gpt-4o-mini) ---------
+
+You are a senior journalist at a digital news magazine. Given a trending
+news headline, write a deeply informed, original article of 900-1100 words.
+DO NOT repeat the headline verbatim. Write in active voice, crisp sentences.
+
+Structure:
+  1. Strong lead paragraph (the "so what" — why this matters right now)
+  2. Background / context section
+  3. Current developments with specifics
+  4. One expert-attributed insight or quote (synthesised realistically)
+  5. Analysis of broader implications
+  6. Forward-looking conclusion
+
+Be specific, cite plausible figures where relevant, avoid generic filler.
+
+Respond with ONLY a single valid JSON object (no markdown, no code fences)
+using exactly these keys:
+  "title"            compelling headline, under 70 chars
+  "excerpt"          2-3 sentence hook under 220 chars
+  "metaDescription"  SEO meta under 155 chars
+  "metaKeywords"     array of 6-9 keyword strings
+  "tags"             array of 3-5 short topic tags
+  "category"         the given category
+  "imageSearchQuery" 3-4 plain keywords for finding relevant stock photos
+                     (e.g. "electric vehicle charging station")
+  "content"          full article body as clean semantic HTML using
+                     <p>, <h2>, <h3>, <ul>, <li>, <blockquote>;
+                     NO <h1> or the title inside content.
+                     Place <!--INLINE_IMAGE_1--> after the first major
+                     section ends.
+                     Place <!--INLINE_IMAGE_2--> after the second major
+                     section ends.
+  "imagePrompt"      vivid, cinematic prompt for an editorial featured image:
+                     describe a specific scene with lighting, mood, and
+                     professional photography style; photorealistic,
+                     no text in image
+  "imageAlt"         concise descriptive alt text
+The JSON must be strictly parseable.
+
+--- USER MESSAGE (per run) ---------------------------------------------
+
+Write an original SEO news article inspired by this trending item.
+Category: {{ category }}
+Trending headline: {{ topic }}
+Context: {{ snippet }}
+
+--- IMAGE SOURCES (Fetch Inline Images node) ----------------------------
+
+Two free sources are tried for in-article images (both conditional — if
+neither returns a match, the article publishes without inline images):
+
+  1. Wikipedia Commons (no API key needed)
+     Searches by article headline. Returns Creative Commons images.
+     Filter: skips .svg files. Inserts as <!--INLINE_IMAGE_1-->.
+
+  2. Pexels API (free key from pexels.com/api)
+     Searches by imageSearchQuery from GPT output.
+     Returns high-quality, editorially-licensed stock photos.
+     Inserts as <!--INLINE_IMAGE_2-->.
+     To enable: replace 'YOUR_PEXELS_API_KEY' in the "Fetch Inline Images"
+     Code node with your actual key.
+
+--- FEATURED IMAGE PROMPT (Generate Featured Image node, gpt-image-1) ---
+
+Uses the "imagePrompt" field produced by the article step above.
+Model: gpt-image-1, quality: medium (raised from low for sharper results).
+One AI image per post only. Additional in-article images come from free
+stock sources (Wikipedia Commons, Pexels).
+
+--- COST ESTIMATE -------------------------------------------------------
+
+  gpt-4o-mini article (~1000 words):  ~$0.002 / run
+  gpt-image-1 (quality: medium):      ~$0.03-0.05 / run
+  Wikipedia Commons API:              free
+  Pexels API (free tier):             free (200 req/hour, 20k/month)
+
+  At 1 run/day: ~$1.00-1.60 / month total.
