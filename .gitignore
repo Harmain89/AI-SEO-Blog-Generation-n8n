@@ -1,0 +1,130 @@
+# ==============================================================================
+# Git Ignore for AI SEO Blog Generation (n8n + OpenAI + React + Node.js + MySQL)
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# Environment Variables & Secrets (CRITICAL)
+# ------------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+*.env
+
+# API Keys, OAuth tokens & Credential files
+credentials.json
+client_secret*.json
+service-account*.json
+token.json
+oauth-credentials.json
+*.pem
+*.key
+*.cert
+*.crt
+
+# ------------------------------------------------------------------------------
+# Dependencies & Package Managers
+# ------------------------------------------------------------------------------
+node_modules/
+*/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# ------------------------------------------------------------------------------
+# Build & Distribution Outputs (Frontend / Vite / React)
+# ------------------------------------------------------------------------------
+dist/
+dist-ssr/
+build/
+*.local
+.cache/
+.parcel-cache/
+*.tsbuildinfo
+
+# ------------------------------------------------------------------------------
+# Application Uploads & Generated Media
+# ------------------------------------------------------------------------------
+uploads/*
+!uploads/.gitkeep
+application/server/uploads/*
+!application/server/uploads/.gitkeep
+
+# ------------------------------------------------------------------------------
+# Databases, SQLite & Dumps
+# ------------------------------------------------------------------------------
+*.sqlite
+*.sqlite3
+*.db
+executions.db
+database.sqlite
+*.sql.gz
+dump.rdb
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# ------------------------------------------------------------------------------
+# n8n Automation Engine & Workflow Backups
+# ------------------------------------------------------------------------------
+.n8n/
+n8n-data/
+n8n_data/
+*.backup.json
+
+# ------------------------------------------------------------------------------
+# Operating System & File System Artifacts
+# ------------------------------------------------------------------------------
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+Desktop.ini
+desktop.ini
+$RECYCLE.BIN/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+
+# ------------------------------------------------------------------------------
+# IDEs & Code Editors
+# ------------------------------------------------------------------------------
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# ------------------------------------------------------------------------------
+# Logs, Testing & Temporary Directories
+# ------------------------------------------------------------------------------
+logs/
+*.log
+coverage/
+.nyc_output/
+.eslintcache
+tmp/
+temp/
+scratch/

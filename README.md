@@ -6,7 +6,7 @@
 ### *The Zero-Human Daily Content Machine: From Breaking Tech RSS to Published, Illustrated, SEO-Optimized Articles in 60 Seconds*
 
 <p align="center">
-  <img src="assets/hero-sketch.jpg" alt="Trendwire Autonomous Content Engine Architecture Banner" width="100%" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.4);" />
+  <img src="docs/assets/hero-sketch.jpg" alt="Trendwire Autonomous Content Engine Architecture Banner" width="100%" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.4);" />
 </p>
 
 [![n8n](https://img.shields.io/badge/Orchestrator-n8n_v1.3+-EA4B71?style=for-the-badge&logo=n8n&logoColor=white)](https://n8n.io/)
@@ -14,7 +14,7 @@
 [![React](https://img.shields.io/badge/Frontend-React_18_%2B_Vite_6-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
 [![Node.js](https://img.shields.io/badge/Backend-Node.js_18%2B_%2B_Express-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 [![MySQL](https://img.shields.io/badge/Database-MySQL_%2B_Sequelize-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](../LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
 
 <br/>
 
@@ -65,7 +65,7 @@
 Traditional content marketing and SEO authority building suffer from extreme latency, high overhead costs, and inconsistent output. Building top-of-funnel organic search traffic usually requires maintaining an agency retainer or hiring dedicated copywriters.
 
 <p align="center">
-  <img src="assets/problem-solution-sketch.jpg" alt="Problem vs Solution: Manual Content Grind vs Trendwire Autonomous Engine" width="100%" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.4);" />
+  <img src="docs/assets/problem-solution-sketch.jpg" alt="Problem vs Solution: Manual Content Grind vs Trendwire Autonomous Engine" width="100%" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.4);" />
 </p>
 
 ### 📊 Comparative Benchmark Matrix
@@ -88,7 +88,7 @@ Traditional content marketing and SEO authority building suffer from extreme lat
 The system employs a strict separation of concerns: the **Automation Layer (n8n)** handles real-time intelligence gathering, AI generation, and multi-source media synthesis; the **Application Layer (Node.js/Express)** enforces authentication, image storage, and database persistence; and the **Presentation Layer (React/Vite)** delivers high-speed editorial rendering.
 
 <p align="center">
-  <img src="assets/workflow-sketch.jpg" alt="End-to-End System Architecture Blueprint" width="100%" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.4);" />
+  <img src="docs/assets/workflow-sketch.jpg" alt="End-to-End System Architecture Blueprint" width="100%" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.4);" />
 </p>
 
 ### 🔄 End-to-End Execution Sequence
@@ -133,7 +133,7 @@ The system employs a strict separation of concerns: the **Automation Layer (n8n)
 The workflow includes multi-tier validation, resilient parsing fallbacks, and media fault tolerance to ensure unattended daily runs never stall.
 
 <p align="center">
-  <img src="assets/decision-flow-sketch.jpg" alt="Trendwire Decision Logic and Fallback Flowchart" width="100%" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.4);" />
+  <img src="docs/assets/decision-flow-sketch.jpg" alt="Trendwire Decision Logic and Fallback Flowchart" width="100%" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.4);" />
 </p>
 
 ### Key Fallback Mechanisms:
@@ -227,7 +227,7 @@ The `/sitemap.xml` endpoint immediately updates to include the new post for Goog
 <a id="nodes"></a>
 ## 🧩 Workflow Node 1-to-1 Deep Dive
 
-The n8n workflow definition in [`main-workflow.json`](../main-workflow.json) comprises 11 tightly integrated nodes:
+The n8n workflow definition in [`main-workflow.json`](main-workflow.json) comprises 11 tightly integrated nodes:
 
 ```
  [1. Daily Trigger] ──> [2. Pick Topic] ──> [3. Fetch RSS] ──> [4. Select Top Headline]
@@ -383,7 +383,7 @@ npm run dev
 2. **Import Workflow**:
    - Open `http://localhost:5678`.
    - Navigate to **Workflows ➔ Import from File**.
-   - Select [`main-workflow.json`](../main-workflow.json).
+   - Select [`main-workflow.json`](main-workflow.json).
 
 3. **Configure Credentials & Keys**:
    - Under **Credentials**, create an **OpenAI** credential with your OpenAI API key and link it to the `Write SEO Article` and `Generate Featured Image` nodes.
@@ -520,7 +520,7 @@ AI-SEO-Blog-Generation-n8n/
 
 ## 📄 License
 
-Distributed under the **MIT License**. See [`LICENSE`](../LICENSE) for complete details.
+Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for complete details.
 
 ---
 
